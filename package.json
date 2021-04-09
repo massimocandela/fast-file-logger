@@ -15,7 +15,7 @@
   },
   "scripts": {
     "compile": "./node_modules/.bin/babel src -d dist/",
-    "serve": "babel-node index.js"
+    "serve": "babel-node src/fileLogger.js"
   },
   "keywords": [
     "logger",
@@ -30,5 +30,55 @@
     "@babel/preset-env": "^7.13.12",
     "dotenv-cli": "^4.0.0",
     "release-it": "^14.5.0"
+  },
+  "release-it": {
+    "hooks": {
+      "before:init": [
+        "npm ci"
+      ],
+      "after:bump": "npm run compile",
+      "after:release": [
+        "echo Successfully released ${name} v${version} to ${repo.repository}.",
+        "rm -r dist/"
+      ]
+    },
+    "git": {
+      "changelog": "git log --pretty=format:\"* %s (%h)\" ${from}...${to}",
+      "requireCleanWorkingDir": true,
+      "requireBranch": "master",
+      "requireUpstream": true,
+      "requireCommits": false,
+      "addUntrackedFiles": false,
+      "commit": true,
+      "commitMessage": "Release v${version}",
+      "commitArgs": [],
+      "tag": true,
+      "tagName": null,
+      "tagAnnotation": "Release v${version}",
+      "tagArgs": [],
+      "push": true,
+      "pushArgs": [
+        "--follow-tags"
+      ],
+      "pushRepo": ""
+    },
+    "gitlab": {
+      "release": false
+    },
+    "npm": {
+      "publish": true
+    },
+    "github": {
+      "release": true,
+      "releaseName": "v${version}",
+      "tokenRef": "GITHUB_TOKEN",
+      "origin": null,
+      "skipChecks": false
+    }
+  },
+  "dependencies": {
+    "file-stream-rotator": "^0.5.7",
+    "moment": "^2.29.1",
+    "zlib": "^1.0.5"
   }
 }

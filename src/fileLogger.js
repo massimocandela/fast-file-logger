@@ -4,7 +4,6 @@ import zlib from 'zlib';
 import fs from 'fs';
 
 export default class FileLogger {
-
     constructor(params) {
         this.format = params.format || this.defaultFormat;
         this.logRotatePattern = params.logRotatePattern || "YYYY-MM-DD";
