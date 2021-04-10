@@ -1,7 +1,7 @@
 {
   "name": "fast-file-logger",
   "version": "1.0.0",
-  "description": "",
+  "description": "High performance file logger that supports file rotation and compression.",
   "author": {
     "name": "Massimo Candela",
     "url": "https://massimocandela.com"
@@ -15,7 +15,8 @@
   },
   "scripts": {
     "compile": "./node_modules/.bin/babel src -d dist/",
-    "serve": "babel-node src/fileLogger.js"
+    "serve": "babel-node src/fileLogger.js",
+    "release": "dotenv release-it"
   },
   "keywords": [
     "logger",
