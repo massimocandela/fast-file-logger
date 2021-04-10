@@ -22,7 +22,7 @@ const logger = new FileLogger({
     maxFileSizeMB: 60,                           // Amount of MB before the file is rotated, independently from the date pattern (.1, .2, etc. is prepended)
     compressOnRotation: false,                   // Compress the file on rotation
     label: 'production',                         // A label that will be prepended to each log. You can use labels to distinguish different logger instances to the same file
-    useUTC: true,                                // Use UTC for the timestamp in the logs, use logal timezone otherwise
+    useUTC: true,                                // Use UTC for the timestamp in the logs, use local timezone otherwise
     format: ({data, timestamp}) => `${timestamp} ${data.level}: ${data.message}` // The format of the log
 });
 ```
