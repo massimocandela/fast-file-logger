@@ -7,12 +7,15 @@
     "url": "https://massimocandela.com"
   },
   "license": "BSD-3-Clause",
-  "main": "src/fileLogger.js",
-  "bin": "dist/fileLogger.js",
+  "main": "dist/fileLogger.js",
+  "bin": {
+    "fast-file-logger": "dist/fileLogger.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/massimocandela/fast-file-logger.git"
   },
+  "homepage": "https://github.com/massimocandela/fast-file-logger#readme",
   "scripts": {
     "compile": "./node_modules/.bin/babel src -d dist/",
     "serve": "babel-node src/fileLogger.js",
