@@ -26,14 +26,14 @@
     "file logger"
   ],
   "devDependencies": {
-    "@babel/cli": "^7.13.14",
-    "@babel/core": "^7.13.14",
-    "@babel/node": "^7.13.13",
+    "@babel/cli": "^7.14.3",
+    "@babel/core": "^7.14.3",
+    "@babel/node": "^7.14.2",
     "@babel/plugin-proposal-class-properties": "^7.13.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.13.8",
-    "@babel/preset-env": "^7.13.12",
+    "@babel/plugin-proposal-object-rest-spread": "^7.14.4",
+    "@babel/preset-env": "^7.14.4",
     "dotenv-cli": "^4.0.0",
-    "release-it": "^14.5.0"
+    "release-it": "^14.8.0"
   },
   "release-it": {
     "hooks": {
