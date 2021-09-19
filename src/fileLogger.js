@@ -82,4 +82,10 @@ export default class FileLogger {
             console.log(error);
         }
     };
+
+    getCurrentFile = () => {
+        const filename = this.filename.replace("%DATE%", this.getCurrentDate().format(this.logRotatePattern));
+
+        return `${this.directory}/${filename}`;
+    };
 };
