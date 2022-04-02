@@ -33,7 +33,7 @@ export default class FileLogger {
             create_symlink: !!this.symLinkName,
             symlink_name: this.symLinkName,
             verbose: false,
-            audit_file: `${this.directory}/.${this.symLinkName.replace(".log", "")}`
+            audit_file: this.symLinkName ? `${this.directory}/.${this.symLinkName.replace(".log", "")}` : null
         };
 
         this.stream = rotatingLogStream.getStream(streamOptions);
