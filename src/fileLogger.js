@@ -30,7 +30,7 @@ export default class FileLogger {
             max_logs: this.maxRetainedFiles,
             date_format: this.logRotatePattern,
             utc: this.useUTC,
-            create_symlink: true,
+            create_symlink: !!this.symLinkName,
             symlink_name: this.symLinkName,
             verbose: false,
             audit_file: `${this.directory}/.${this.symLinkName.replace(".log", "")}`
