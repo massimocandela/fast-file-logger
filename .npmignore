@@ -17,3 +17,5 @@ index.js
 .eslintrc.json
 .babelrc
 .env
+~/
+.npm/
