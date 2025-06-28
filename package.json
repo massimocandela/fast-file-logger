@@ -1,6 +1,6 @@
 {
   "name": "fast-file-logger",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "High performance file logger that supports file rotation and compression.",
   "author": {
     "name": "Massimo Candela",
