@@ -14,7 +14,7 @@ npm install fast-file-logger
 
 ```js
 const logger = new FileLogger({
-    logRotatePattern: 'YYYY-MM-DD',              // The date pattern that will be used to rotate the file
+    logRotatePattern: 'YYYY-MM-DD',              // The date pattern that will be used to rotate the file (numeric tokens only: Y, M, D, H, m, s, plus A for AM/PM)
     filename: 'error-%DATE%.log',                // The file name, optionally including the pattern
     symLink: 'error.log',                        // The name of the symlink to the latest file, disabled if null
     directory: '/var/www/log/',                  // The directory containing the logs
