@@ -19,22 +19,17 @@ const waitFor = async (condition, timeout = 2000) => {
     }
 };
 
-// Listen on the active file stream: the rotator also bubbles events from streams closed by rotation
-const close = (logger) => new Promise(resolve => {
-    logger.stream.fs.once("close", resolve);
-    logger.stream.end();
-});
+const close = (logger) => new Promise(resolve => logger.stream.end(resolve));
 
 const readLines = (file) => fs.readFileSync(file, "utf8").split("\n").filter(Boolean);
 
 const logFiles = (directory) => fs.readdirSync(directory, {withFileTypes: true})
-    .filter(f => f.isFile() && /^app-.*\.log\.\d+$/.test(f.name))
+    .filter(f => f.isFile() && /^app-.*\.log(\.\d+)?$/.test(f.name))
     .map(f => path.join(directory, f.name));
 
 describe("FileLogger", function () {
     let directory;
 
-    // Always set symLink in tests, otherwise the audit file is written in the cwd
     const createLogger = (params = {}) => new FileLogger({
         directory,
         filename: "app-%DATE%.log",
@@ -56,9 +51,9 @@ describe("FileLogger", function () {
         await close(logger);
     });
 
-    it("names the current file using the date pattern and size index", async () => {
+    it("names the first file using the date pattern without a size index", async () => {
         const logger = createLogger();
-        const expected = path.join(directory, `app-${moment().format("YYYY-MM-DD")}.log.0`);
+        const expected = path.join(directory, `app-${moment().format("YYYY-MM-DD")}.log`);
 
         expect(path.normalize(logger.getCurrentFile())).to.equal(expected);
         await close(logger);
@@ -67,7 +62,7 @@ describe("FileLogger", function () {
     it("supports a custom rotation pattern", async () => {
         const logger = createLogger({logRotatePattern: "YYYY-MM"});
 
-        expect(path.basename(logger.getCurrentFile())).to.equal(`app-${moment().format("YYYY-MM")}.log.0`);
+        expect(path.basename(logger.getCurrentFile())).to.equal(`app-${moment().format("YYYY-MM")}.log`);
         await close(logger);
     });
 
@@ -102,7 +97,7 @@ describe("FileLogger", function () {
 
         const [line] = readLines(logger.getCurrentFile()).map(JSON.parse);
         expect(line.timestamp).to.match(/\+00:00$/);
-        expect(path.basename(logger.getCurrentFile())).to.equal(`app-${moment.utc().format("YYYY-MM-DD")}.log.0`);
+        expect(path.basename(logger.getCurrentFile())).to.equal(`app-${moment.utc().format("YYYY-MM-DD")}.log`);
     });
 
     it("does not throw when the format function fails", async () => {
@@ -121,7 +116,7 @@ describe("FileLogger", function () {
         await close(logger);
     });
 
-    it("creates a symlink to the current file and keeps the audit file in the log directory", async () => {
+    it("creates a symlink to the current file", async () => {
         const logger = createLogger();
         logger.log({message: "x"});
         await close(logger);
@@ -129,7 +124,6 @@ describe("FileLogger", function () {
         const link = path.join(directory, "app.log");
         expect(fs.lstatSync(link).isSymbolicLink()).to.equal(true);
         expect(fs.readlinkSync(link)).to.equal(path.basename(logger.getCurrentFile()));
-        expect(fs.existsSync(path.join(directory, ".app"))).to.equal(true);
     });
 
     it("rotates when the max file size is reached", async () => {
@@ -142,7 +136,19 @@ describe("FileLogger", function () {
         await close(logger);
 
         expect(logger.getCurrentFile()).to.not.equal(first);
-        expect(logFiles(directory).length).to.be.greaterThan(1);
+        expect(logFiles(directory)).to.include(`${first}.1`);
+    });
+
+    it("resumes from the latest file after a restart", async () => {
+        const logger = createLogger({maxFileSizeMB: 0.001});
+        for (let i = 0; i < 30; i++) {
+            logger.log({i, message: "x".repeat(50)});
+        }
+        await close(logger);
+
+        const restarted = createLogger({maxFileSizeMB: 0.001});
+        expect(restarted.getCurrentFile()).to.equal(logger.getCurrentFile());
+        await close(restarted);
     });
 
     it("keeps at most maxRetainedFiles files", async () => {
@@ -150,8 +156,6 @@ describe("FileLogger", function () {
 
         for (let i = 0; i < 100; i++) {
             logger.log({i, message: "x".repeat(50)});
-            // file-stream-rotator can't delete files whose async open hasn't completed yet
-            await wait(2);
         }
         await close(logger);
 

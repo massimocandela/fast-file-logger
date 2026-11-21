@@ -1,8 +1,8 @@
 import moment from "moment";
-import {getStream} from "file-stream-rotator";
 import zlib from "zlib";
 import fs from "fs";
 import {pipeline} from "stream";
+import RotatingFileStream from "./rotatingFileStream.js";
 
 export default class FileLogger {
     constructor(params) {
@@ -23,28 +23,19 @@ export default class FileLogger {
             fs.mkdirSync(this.directory);
         }
 
-        const streamOptions = {
-            filename: `${this.directory}/${this.filename}`,
-            // file-stream-rotator only parses integer sizes
-            size: `${Math.max(1, Math.round(this.maxFileSizeMB * 1024))}k`,
-            frequency: "custom",
-            end_stream: true,
-            max_logs: this.maxRetainedFiles,
-            date_format: this.logRotatePattern,
-            utc: this.useUTC,
-            create_symlink: !!this.symLinkName,
-            symlink_name: this.symLinkName,
-            verbose: false,
-            audit_file: this.symLinkName ? `${this.directory}/.${this.symLinkName.replace(".log", "")}` : null
-        };
-
-        this.stream = getStream(streamOptions);
+        this.stream = new RotatingFileStream({
+            directory: this.directory,
+            filename: this.filename,
+            datePattern: this.logRotatePattern,
+            useUTC: this.useUTC,
+            maxSize: this.maxFileSizeMB * 1024 * 1024,
+            maxFiles: this.maxRetainedFiles,
+            symLink: this.symLinkName
+        });
+        this.stream.on("error", console.log);
 
         if (this.compressOnRotation) {
             this.stream.on("rotate", (oldFile) => {
-                if (!oldFile) {
-                    return;
-                }
                 const tmpFile = oldFile + ".tmp";
                 pipeline(fs.createReadStream(oldFile), zlib.createGzip(), fs.createWriteStream(tmpFile), (error) => {
                     try {
@@ -88,7 +79,6 @@ export default class FileLogger {
         }
     };
 
-    // v1 appends a size index (.0, .1, ...) to the name, so ask the rotator instead of rebuilding it
     getCurrentFile = () => {
         return this.stream.currentFile;
     };

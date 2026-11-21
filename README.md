@@ -14,12 +14,12 @@ npm install fast-file-logger
 
 ```js
 const logger = new FileLogger({
-    logRotatePattern: 'YYYY-MM-DD',              // The date pattern that will be used to rotate the file (numeric tokens only: Y, M, D, H, m, s, plus A for AM/PM)
+    logRotatePattern: 'YYYY-MM-DD',              // The date pattern that will be used to rotate the file (any moment.js format)
     filename: 'error-%DATE%.log',                // The file name, optionally including the pattern
     symLink: 'error.log',                        // The name of the symlink to the latest file, disabled if null
     directory: '/var/www/log/',                  // The directory containing the logs
     maxRetainedFiles: 10,                        // How many files will be retained, the rest are deleted
-    maxFileSizeMB: 60,                           // Amount of MB before the file is rotated, independently from the date pattern (.1, .2, etc. is prepended)
+    maxFileSizeMB: 60,                           // Amount of MB before the file is rotated, independently from the date pattern (.1, .2, etc. is appended)
     compressOnRotation: false,                   // Compress the file on rotation
     label: 'production',                         // A label that will be prepended to each log. You can use labels to distinguish different logger instances to the same file
     useUTC: true,                                // Use UTC for the timestamp in the logs, use local timezone otherwise
