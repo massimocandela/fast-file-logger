@@ -19,6 +19,7 @@
   "scripts": {
     "compile": "./node_modules/.bin/babel src -d dist/",
     "serve": "babel-node src/fileLogger.js",
+    "test": "mocha \"tests/**/*.test.js\"",
     "release": "dotenv release-it"
   },
   "keywords": [
